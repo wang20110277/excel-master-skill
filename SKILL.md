@@ -6,7 +6,8 @@ description: >
   project plans (项目计划表), or any structured Excel document. Triggers on mentions of: 测试用例, 需求文档, 项目计划, 任务列表,
   Excel generation, xlsx output, formatted spreadsheet, epm, test case table, requirement matrix, or when a user provides
   structured data (in conversation or files) that maps naturally to a tabular format. Also use when a user asks to convert
-  JSON/YAML/Markdown/text data into a formatted Excel file, or when designing custom Excel templates for business documents.
+  JSON/YAML/Markdown/text data into a formatted Excel file, when analyzing UI screenshots to generate test cases,
+  or when designing custom Excel templates for business documents.
 ---
 
 # Excel Master Skill
@@ -19,7 +20,8 @@ You should use this skill when:
 - The user wants to generate an Excel (.xlsx) file from structured data
 - The user describes test cases, requirements, or project tasks and wants them in a formatted document
 - The user has data in JSON/YAML/Markdown/text/docx format and wants it converted to a styled spreadsheet
-- The user says things like "帮我写测试用例", "整理需求到Excel", "生成项目计划表", "把这些数据放到Excel里"
+- The user has UI screenshots or design images and wants to generate test cases from them
+- The user says things like "帮我写测试用例", "整理需求到Excel", "生成项目计划表", "把这些数据放到Excel里", "根据截图生成测试用例", "分析图片生成Excel"
 
 ## Reference Files
 
@@ -110,6 +112,45 @@ When the user provides a file path:
 3. If format is unclear or the file doesn't parse, check `TROUBLESHOOTING.md`
 4. Use the file directly as input — no need to rewrite it
 
+### Source C — Image-based data (screenshots → test cases)
+
+When the user has UI screenshots or design images in a folder and wants to generate test cases:
+
+1. **Scan the folder** for image files (PNG/JPG/JPEG/BMP):
+   ```bash
+   ls -1 <folder>/*.png
+   ```
+
+2. **Analyze each image** using agent's built-in vision capability (Read tool or analyze_image MCP tool):
+   - Read each screenshot and describe UI elements: fields, buttons, dialogs, lists, menus, tabs, validation messages
+   - Filenames are often descriptive — use them to understand the feature context
+   - Focus on: query conditions, form fields, action buttons, list columns, error messages, workflow states
+
+3. **Generate JSON test cases** based on analysis:
+   - Read the relevant schema (e.g., `schemas/test-case.yaml`) for field definitions
+   - Each distinct feature/interaction from screenshots becomes one test case
+   - Map observed UI behavior to: module, title, priority, precondition, steps, expected result
+   - Write all records to a JSON file (e.g., `<folder>/testcases.json`)
+   - **Omit `id` fields** — they are auto-generated
+   - **Omit `status` fields** — default is `待执行`
+
+4. **Generate Excel** from the JSON:
+   ```bash
+   epm create -t test-case -i <folder>/testcases.json -f image -o <folder>/测试用例.xlsx
+   ```
+
+Example workflow:
+```
+User: "根据 tests/项目计划/ 文件夹下的截图生成测试用例"
+
+Agent:
+1. ls tests/项目计划/*.png  →  finds 31 screenshots
+2. Read & analyze each image → extract UI elements, features, behaviors
+3. Write tests/项目计划/testcases.json with 32 test case records
+4. epm create -t test-case -i tests/项目计划/testcases.json -f image -o tests/项目计划/项目计划测试用例.xlsx
+5. Report: "Generated 32 test cases from 31 screenshots"
+```
+
 ### Input file structure (JSON array)
 
 ```json
@@ -147,6 +188,15 @@ Options:
 - Use `-` as input for stdin: `echo '[...]' | epm create --template test-case --input - --format json --output out.xlsx`
 
 Pick a descriptive output filename based on content (e.g., `登录模块测试用例.xlsx`, `Q2项目计划.xlsx`).
+
+### Output styling
+
+The generated Excel has consistent styling:
+- **Header row**: black bold font + blue background + border + center alignment
+- **Data rows**: black normal font + no background + border + inherited alignment
+- **Dropdown validation**: columns with `validate` options get Excel dropdown lists (e.g., 优先级: 高/中/低)
+- **Auto row height**: multiline fields (like `steps`) auto-expand row height
+- **Auto ID**: columns with `auto_generate` produce sequential IDs (TC-001, TC-002, ...)
 
 ## Step 4 — Report and Handle Issues
 
@@ -210,3 +260,5 @@ Column properties: `field` (required), `header` (required), `width` (default 15)
 - **Use JSON** for programmatic data preparation — most reliable
 - **Check stderr** for warnings about invalid/missing fields
 - **Read the schema** before preparing data — it has the authoritative field definitions
+- **For image-based workflows** — use agent's built-in vision (Read tool or analyze_image), no external API key or model needed
+- **Use `-f image`** when the input JSON was generated from image analysis
