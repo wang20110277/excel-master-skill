@@ -1,0 +1,50 @@
+[
+  {
+    "name": "需求分析与评审",
+    "owner": "王五",
+    "start_date": "2026-04-21",
+    "end_date": "2026-04-25",
+    "status": "进行中",
+    "notes": "完成PRD v2.0评审"
+  },
+  {
+    "name": "UI设计",
+    "owner": "赵六",
+    "start_date": "2026-04-28",
+    "end_date": "2026-05-09",
+    "status": "未开始",
+    "notes": "依赖需求分析完成"
+  },
+  {
+    "name": "前端开发",
+    "owner": "李四",
+    "start_date": "2026-05-12",
+    "end_date": "2026-06-06",
+    "status": "未开始",
+    "notes": "使用React框架"
+  },
+  {
+    "name": "后端开发",
+    "owner": "张三",
+    "start_date": "2026-05-12",
+    "end_date": "2026-06-06",
+    "status": "未开始",
+    "notes": "RESTful API设计"
+  },
+  {
+    "name": "联调测试",
+    "owner": "王五",
+    "start_date": "2026-06-09",
+    "end_date": "2026-06-20",
+    "status": "未开始",
+    "notes": "前后端联调+系统集成测试"
+  },
+  {
+    "name": "上线部署",
+    "owner": "张三",
+    "start_date": "2026-06-23",
+    "end_date": "2026-06-25",
+    "status": "未开始",
+    "notes": "灰度发布"
+  }
+]

@@ -1,0 +1,25 @@
+[
+  {
+    "description": "用户可以通过邮箱注册账号，注册后需邮箱验证",
+    "source": "PRD v2.0 第3.1节",
+    "priority": "高",
+    "status": "已确认",
+    "owner": "张三",
+    "test_cases": "TC-001, TC-004"
+  },
+  {
+    "description": "用户登录后可以选择'记住我'，7天内免登录",
+    "source": "PRD v2.0 第3.2节",
+    "priority": "中",
+    "status": "开发中",
+    "owner": "李四",
+    "test_cases": "TC-001, TC-002"
+  },
+  {
+    "description": "密码长度不少于8位，必须包含字母和数字",
+    "source": "安全规范 v1.0",
+    "priority": "高",
+    "status": "已完成",
+    "owner": "张三"
+  }
+]
